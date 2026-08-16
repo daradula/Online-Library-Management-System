@@ -1,0 +1,62 @@
+﻿version: "3.9"
+
+# Online Library Management System — root orchestration file
+# Student 1 (Rashmi)   -> auth-service, api-gateway
+# Student 2 (Sewwandi) -> book-service   [Docker/Containerization Lead]
+# Student 3 (Kumari)   -> borrowing-service
+
+services:
+
+  # ---------- Student 1: User & Auth Service ----------
+  auth-service:
+    build:
+      context: ./auth-service
+    container_name: auth-service
+    ports:
+      - "8081:8081"
+    environment:
+      - SERVER_PORT=8081
+    networks:
+      - library-net
+
+  # ---------- Student 2: Book / Catalog Service ----------
+  book-service:
+    build:
+      context: ./library-system/book-service/book-service
+    container_name: book-service
+    ports:
+      - "8082:8082"
+    environment:
+      - SERVER_PORT=8082
+    networks:
+      - library-net
+
+  # ---------- Student 3: Borrowing Service ----------
+  borrowing-service:
+    build:
+      context: ./borrowing-service/borrowing-service
+    container_name: borrowing-service
+    ports:
+      - "8083:8083"
+    environment:
+      - SERVER_PORT=8083
+    networks:
+      - library-net
+
+  # ---------- Student 1: API Gateway ----------
+  api-gateway:
+    build:
+      context: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - auth-service
+      - book-service
+      - borrowing-service
+    networks:
+      - library-net
+
+networks:
+  library-net:
+    driver: bridge
