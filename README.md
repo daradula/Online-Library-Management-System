@@ -1,8 +1,8 @@
 # Online Library Management System
 # group_members
 STUDENT - 01 R.S. AThapaththu
-STUDENT - 02 M.M.S. Nethmini
-STUDENT - 03 M.D.M.D. Kumari
+| STUDENT - 02 M.M.S. Nethmini
+| STUDENT - 03 M.D.M.D. Kumari
 
 
 ## Auth Service (Student 1 - Rashmi)
