@@ -1,5 +1,12 @@
 # Online Library Management System
-## Auth Service (Student: Rashmi)
+# group_members
+STUDENT - 01 R.S. AThapaththu
+STUDENT - 02 M.M.S. Nethmini
+STUDENT - 03 M.D.M.D. Kumari
+
+
+## Auth Service (Student 1 - Rashmi)
+
 
 ### Swagger UI
 - URL: http://localhost:8081/swagger-ui/index.html
@@ -33,3 +40,5 @@ Body: {"email": "user@example.com"}
 
 ### Rate Limiting
 20 requests per minute per client IP
+
+
