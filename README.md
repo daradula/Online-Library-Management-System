@@ -59,7 +59,7 @@ Each service's port is externalized through a `SERVER_PORT` environment variable
 ```bash
 docker build -t book-service .
 docker run -p 8082:8082 --name book-container book-service
-
+```
 ## Student 3 — Borrowing Service
 
 **Role:** Microservice Developer + Client App Lead
