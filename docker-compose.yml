@@ -1,0 +1,73 @@
+version: "3.9"
+
+services:
+
+# ---------- Student 1: User & Auth Service + Gateway ----------
+  auth-service:
+    build:
+      context: ./auth-service
+    container_name: auth-service
+    ports:
+      - "8081:8081"
+    networks:
+      - library-net
+  api-gateway:
+    build:
+      context: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - auth-service
+      - book-service
+      - borrowing-service
+    networks:
+      - library-net
+
+
+  # ---------- Student 2: Product / Book Catalog Service ----------
+  # book-service:
+  #   build:
+  #     context: ./book-service/book-service
+  #   container_name: book-service
+  #   ports:
+  #     - "8082:8082"
+  #   networks:
+  #     - library-net
+
+  # ---------- Student 1: User & Auth Service + Gateway ----------
+  # auth-service:
+  #   build:
+  #     context: ./auth-service/auth-service
+  #   container_name: auth-service
+  #   ports:
+  #     - "8081:8081"
+  #   networks:
+  #     - library-net
+
+  # api-gateway:
+  #   build:
+  #     context: ./api-gateway
+  #   container_name: api-gateway
+  #   ports:
+  #     - "8080:8080"
+  #   depends_on:
+  #     - auth-service
+  #     - book-service
+  #     - borrowing-service
+  #   networks:
+  #     - library-net
+
+networks:
+  library-net:
+    driver: bridge
+
+    # ---------- Student 3: Borrowing Service ----------
+  borrowing-service:
+    build:
+      context: ./borrowing-service/borrowing-service
+    container_name: borrowing-service
+    ports:
+      - "8083:8083"
+    networks:
+      - library-net
