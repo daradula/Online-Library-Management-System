@@ -9,7 +9,6 @@ STUDENT - 01 R.S. AThapaththu ITBIN-2211-0143
 
 ## Auth Service (Student 1 - Rashmi)
 
-
 ### Swagger UI
 - URL: http://localhost:8081/swagger-ui/index.html
 
@@ -29,17 +28,14 @@ X-API-KEY: library-auth-service-secret-key-2026
 - Password: password123
 
 ## API Gateway (Student: Rashmi)
-
 ### Gateway URL
 http://localhost:8080
 
 ### OAuth Token Endpoint
 POST http://localhost:8080/oauth/token
 Body: {"email": "user@example.com"}
-
 ### Routes
 - /auth/** → Auth Service (localhost:8081)
-
 ### Rate Limiting
 20 requests per minute per client IP
 
@@ -47,11 +43,8 @@ Body: {"email": "user@example.com"}
 ## Student 2 — Book Service & Docker Lead
 
 ### Service Overview
-
 The Book Service is a Spring Boot microservice responsible for managing the library's book catalog. It exposes CRUD operations for books, supports searching by title or author and filtering by category, and tracks each book's availability status.
-
 ### Docker Containerization (Docker Lead Responsibility)
-
 As the Docker/Containerization Lead for the group, I designed and implemented the multi-stage Dockerfile pattern used across all three microservices (Auth Service, Book Service, Loan Service):
 
 - **Stage 1** — Maven + JDK 17 image compiles the source and produces an executable JAR (`mvn clean package -DskipTests`)
@@ -62,9 +55,7 @@ I also authored the root `docker-compose.yml`, which orchestrates all three micr
 ```bash
 docker compose up --build
 ```
-
 Each service's port is externalized through a `SERVER_PORT` environment variable, so container ports can be configured without rebuilding the image. The Book Service can also be built and run independently:
-
 ```bash
 docker build -t book-service .
 docker run -p 8082:8082 --name book-container book-service
@@ -94,28 +85,4 @@ docker run -p 8083:8083 --name borrowing-container borrowing-service
 **Client App:** open `client-app/index.html` in a browser after starting the service.
 ```
 
-## Student 3 — Borrowing Service
 
-**Role:** Microservice Developer + Client App Lead
-Handles borrowing and returning books. Secured with API Key, documented via Swagger, containerized with Docker.
-
-| Method | Endpoint | Description |
-|---|---|---|
-| POST | `/borrowings` | Borrow a book |
-| GET | `/borrowings` | View all borrowings |
-| GET | `/borrowings/user/{userId}` | View a user's borrowing history |
-| PUT | `/borrowings/{id}/return?returnDate=YYYY-MM-DD` | Return a book |
-
-**API Key:** `X-API-KEY: library-secret-key-123`
-
-**Run (Docker):**
-```bash
-cd borrowing-service/borrowing-service
-docker build -t borrowing-service .
-docker run -p 8083:8083 --name borrowing-container borrowing-service
-```
-
-**Swagger UI:** `http://localhost:8083/swagger-ui.html`
-**Client App:** open `client-app/index.html` in a browser after starting the service.
-
----
