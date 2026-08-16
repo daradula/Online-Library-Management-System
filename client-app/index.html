@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Library — Borrowing Service</title>
+<style>
+  :root {
+    --paper: #FAF6ED;
+    --paper-raised: #FFFFFF;
+    --ink: #22301F;
+    --ink-soft: #5B6B57;
+    --forest: #2F4A3D;
+    --forest-dark: #1F332A;
+    --brass: #B08B3D;
+    --brass-soft: #E9D9AE;
+    --clay: #A24B3E;
+    --clay-soft: #F2DAD5;
+    --line: #E4DCC8;
+    --shadow: 0 1px 2px rgba(34,48,31,0.06), 0 6px 20px rgba(34,48,31,0.06);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(34,48,31,0.05) 1px, transparent 0);
+    background-size: 22px 22px;
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    min-height: 100vh;
+  }
+
+  .wrap {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    padding-bottom: 24px;
+    margin-bottom: 32px;
+    border-bottom: 2px solid var(--forest);
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .brand-mark {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: var(--forest);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .brand-mark svg { width: 24px; height: 24px; }
+
+  h1 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 26px;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: -0.01em;
+    color: var(--forest-dark);
+  }
+
+  .subtitle {
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin-top: 2px;
+  }
+
+  .service-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--ink-soft);
+    padding: 6px 12px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--paper-raised);
+    white-space: nowrap;
+  }
+
+  .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #9aa89a;
+  }
+  .dot.ok { background: #3f7a4f; }
+  .dot.down { background: var(--clay); }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  @media (max-width: 720px) {
+    .grid { grid-template-columns: 1fr; }
+  }
+
+  .card {
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--line);
+    background: linear-gradient(180deg, rgba(47,74,61,0.03), transparent);
+  }
+
+  .card-icon {
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .card-icon svg { width: 16px; height: 16px; }
+
+  .icon-borrow { background: var(--brass-soft); color: #7A5B1E; }
+  .icon-all { background: #DDE7DC; color: var(--forest-dark); }
+  .icon-user { background: #DDE7DC; color: var(--forest-dark); }
+  .icon-return { background: var(--clay-soft); color: var(--clay); }
+
+  .card-title { font-size: 14.5px; font-weight: 600; color: var(--ink); }
+  .card-endpoint {
+    font-size: 11px;
+    color: var(--ink-soft);
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    margin-top: 1px;
+  }
+
+  .card-body { padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 12px; flex: 1; }
+
+  .field label {
+    display: block;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-bottom: 5px;
+  }
+
+  .field input {
+    width: 100%;
+    padding: 9px 11px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    font-size: 14px;
+    background: #FFFEFB;
+    color: var(--ink);
+    font-family: inherit;
+  }
+  .field input:focus {
+    outline: none;
+    border-color: var(--forest);
+    box-shadow: 0 0 0 3px rgba(47,74,61,0.12);
+  }
+
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  button.action {
+    margin-top: 4px;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    background: var(--forest);
+    color: #F5F2E6;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background 0.15s ease, transform 0.05s ease;
+  }
+  button.action:hover { background: var(--forest-dark); }
+  button.action:active { transform: scale(0.98); }
+  button.action:disabled { opacity: 0.6; cursor: default; }
+
+  button.action.clay { background: var(--clay); }
+  button.action.clay:hover { background: #8A3B30; }
+
+  .spinner {
+    width: 13px; height: 13px;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+  .spinner.show { display: inline-block; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .result-area { margin-top: 4px; min-height: 0; }
+  .placeholder {
+    font-size: 12.5px;
+    color: #9aa89a;
+    font-style: italic;
+    padding: 8px 2px;
+  }
+
+  .error-box {
+    background: var(--clay-soft);
+    border: 1px solid #E0AEA5;
+    color: #7A2F24;
+    font-size: 12.5px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    line-height: 1.4;
+  }
+
+  .record {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    background: #FFFEFB;
+  }
+  .record:last-child { margin-bottom: 0; }
+
+  .record-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+
+  .record-id {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 11px;
+    color: var(--ink-soft);
+  }
+
+  .badge {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    padding: 3px 9px;
+    border-radius: 999px;
+    text-transform: uppercase;
+  }
+  .badge.borrowed { background: var(--brass-soft); color: #7A5B1E; }
+  .badge.returned { background: #DDE7DC; color: var(--forest-dark); }
+
+  .record-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4px 12px;
+    font-size: 12.5px;
+    color: var(--ink);
+  }
+  .record-grid span.k { color: var(--ink-soft); }
+
+  .results-list { max-height: 260px; overflow-y: auto; padding-right: 2px; }
+
+  footer {
+    margin-top: 36px;
+    text-align: center;
+    font-size: 11.5px;
+    color: var(--ink-soft);
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#F5F2E6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+        </svg>
+      </div>
+      <div>
+        <h1>Borrowing Desk</h1>
+        <div class="subtitle">Online Library Management System — Borrowing Service</div>
+      </div>
+    </div>
+    <div class="service-status" id="statusPill">
+      <span class="dot" id="statusDot"></span>
+      <span id="statusText">Checking service…</span>
+    </div>
+  </header>
+
+  <div class="grid">
+
+    <!-- 1. Borrow -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-icon icon-borrow">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+        </div>
+        <div>
+          <div class="card-title">Borrow a book</div>
+          <div class="card-endpoint">POST /borrowings</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="row2">
+          <div class="field">
+            <label>Book ID</label>
+            <input type="number" id="bookId" value="1">
+          </div>
+          <div class="field">
+            <label>User ID</label>
+            <input type="number" id="userId" value="101">
+          </div>
+        </div>
+        <div class="field">
+          <label>Borrow date</label>
+          <input type="date" id="borrowDate" value="2026-08-16">
+        </div>
+        <button class="action" onclick="borrowBook()">
+          <span class="spinner" id="borrowSpinner"></span>
+          <span>Borrow book</span>
+        </button>
+        <div class="result-area" id="borrowResult">
+          <div class="placeholder">Result will appear here.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. All borrowings -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-icon icon-all">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+        </div>
+        <div>
+          <div class="card-title">All borrowings</div>
+          <div class="card-endpoint">GET /borrowings</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <button class="action" onclick="getAllBorrowings()">
+          <span class="spinner" id="allSpinner"></span>
+          <span>Load all borrowings</span>
+        </button>
+        <div class="result-area" id="allResult">
+          <div class="placeholder">Result will appear here.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. By user -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-icon icon-user">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.2"/><path d="M5 20c1-3.5 4-5.5 7-5.5s6 2 7 5.5"/></svg>
+        </div>
+        <div>
+          <div class="card-title">Borrowings by user</div>
+          <div class="card-endpoint">GET /borrowings/user/{userId}</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="field">
+          <label>User ID</label>
+          <input type="number" id="searchUserId" value="101">
+        </div>
+        <button class="action" onclick="getByUser()">
+          <span class="spinner" id="userSpinner"></span>
+          <span>Search</span>
+        </button>
+        <div class="result-area" id="userResult">
+          <div class="placeholder">Result will appear here.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Return -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-icon icon-return">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 5 5v1"/></svg>
+        </div>
+        <div>
+          <div class="card-title">Return a book</div>
+          <div class="card-endpoint">PUT /borrowings/{id}/return</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="row2">
+          <div class="field">
+            <label>Borrowing ID</label>
+            <input type="number" id="returnId" value="1">
+          </div>
+          <div class="field">
+            <label>Return date</label>
+            <input type="date" id="returnDate" value="2026-08-20">
+          </div>
+        </div>
+        <button class="action clay" onclick="returnBook()">
+          <span class="spinner" id="returnSpinner"></span>
+          <span>Return book</span>
+        </button>
+        <div class="result-area" id="returnResult">
+          <div class="placeholder">Result will appear here.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>Borrowing Service Client · Student 3 · library-secret-key-123 sent as X-API-KEY on every request</footer>
+</div>
+
+<script>
+  const BASE_URL = "http://localhost:8083/borrowings";
+  const API_KEY = "library-secret-key-123";
+
+  function setLoading(spinnerId, isLoading) {
+    const el = document.getElementById(spinnerId);
+    el.classList.toggle("show", isLoading);
+  }
+
+  function renderError(containerId, message) {
+    document.getElementById(containerId).innerHTML =
+      `<div class="error-box"><strong>Request failed.</strong><br>${message}</div>`;
+  }
+
+  function badgeHtml(status) {
+    const cls = status === "RETURNED" ? "returned" : "borrowed";
+    return `<span class="badge ${cls}">${status || "unknown"}</span>`;
+  }
+
+  function recordHtml(b) {
+    return `
+      <div class="record">
+        <div class="record-top">
+          <span class="record-id">Borrowing #${b.id}</span>
+          ${badgeHtml(b.status)}
+        </div>
+        <div class="record-grid">
+          <div><span class="k">Book ID:</span> ${b.bookId}</div>
+          <div><span class="k">User ID:</span> ${b.userId}</div>
+          <div><span class="k">Borrowed:</span> ${b.borrowDate ?? "—"}</div>
+          <div><span class="k">Returned:</span> ${b.returnDate ?? "—"}</div>
+        </div>
+      </div>`;
+  }
+
+  function renderSingle(containerId, data) {
+    document.getElementById(containerId).innerHTML = recordHtml(data);
+  }
+
+  function renderList(containerId, list) {
+    if (!list || list.length === 0) {
+      document.getElementById(containerId).innerHTML =
+        `<div class="placeholder">No records found.</div>`;
+      return;
+    }
+    const items = list.map(recordHtml).join("");
+    document.getElementById(containerId).innerHTML =
+      `<div class="results-list">${items}</div>`;
+  }
+
+  async function apiCall(url, options) {
+    const res = await fetch(url, options);
+    if (!res.ok) {
+      const text = await res.text().catch(() => res.statusText);
+      throw new Error(`${res.status} ${res.statusText} — ${text}`);
+    }
+    return res.json();
+  }
+
+  async function borrowBook() {
+    setLoading("borrowSpinner", true);
+    try {
+      const body = {
+        bookId: Number(document.getElementById("bookId").value),
+        userId: Number(document.getElementById("userId").value),
+        borrowDate: document.getElementById("borrowDate").value
+      };
+      const data = await apiCall(BASE_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-API-KEY": API_KEY },
+        body: JSON.stringify(body)
+      });
+      renderSingle("borrowResult", data);
+    } catch (err) {
+      renderError("borrowResult", err.message);
+    } finally {
+      setLoading("borrowSpinner", false);
+    }
+  }
+
+  async function getAllBorrowings() {
+    setLoading("allSpinner", true);
+    try {
+      const data = await apiCall(BASE_URL, { headers: { "X-API-KEY": API_KEY } });
+      renderList("allResult", data);
+    } catch (err) {
+      renderError("allResult", err.message);
+    } finally {
+      setLoading("allSpinner", false);
+    }
+  }
+
+  async function getByUser() {
+    setLoading("userSpinner", true);
+    try {
+      const userId = document.getElementById("searchUserId").value;
+      const data = await apiCall(`${BASE_URL}/user/${userId}`, { headers: { "X-API-KEY": API_KEY } });
+      renderList("userResult", data);
+    } catch (err) {
+      renderError("userResult", err.message);
+    } finally {
+      setLoading("userSpinner", false);
+    }
+  }
+
+  async function returnBook() {
+    setLoading("returnSpinner", true);
+    try {
+      const id = document.getElementById("returnId").value;
+      const returnDate = document.getElementById("returnDate").value;
+      const data = await apiCall(`${BASE_URL}/${id}/return?returnDate=${returnDate}`, {
+        method: "PUT",
+        headers: { "X-API-KEY": API_KEY }
+      });
+      renderSingle("returnResult", data);
+    } catch (err) {
+      renderError("returnResult", err.message);
+    } finally {
+      setLoading("returnSpinner", false);
+    }
+  }
+
+  // Quick service status check on load
+  (async function checkStatus() {
+    const dot = document.getElementById("statusDot");
+    const text = document.getElementById("statusText");
+    try {
+      const res = await fetch(BASE_URL, { headers: { "X-API-KEY": API_KEY } });
+      if (res.ok) {
+        dot.classList.add("ok");
+        text.textContent = "Service online";
+      } else {
+        dot.classList.add("down");
+        text.textContent = "Service reachable, check key";
+      }
+    } catch {
+      dot.classList.add("down");
+      text.textContent = "Service unreachable";
+    }
+  })();
+</script>
+
+</body>
+</html>
